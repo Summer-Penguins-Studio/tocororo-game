@@ -7,8 +7,8 @@ public class Grid : MonoBehaviour
     public int height;
     public int width;
     public GameObject cellPrefab;
-
     public List<List<GameObject>> grid;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,14 +30,40 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < height; i++)
         {
             List<GameObject> newRow = new List<GameObject>();
+            CellType previousCell = CellType.NONE;
+            CellType grandPreviousCell = CellType.NONE;
+            CellType topCell = CellType.NONE;
+            CellType topTopCell = CellType.NONE;
             for (int j = 0; j < width; j++)
             {
+                List<CellType> bannedTypes = new List<CellType>();
+                if (previousCell == grandPreviousCell)
+                {
+                    bannedTypes.Add(previousCell);
+                }
+                if (i > 0)
+                {
+                    topCell = grid[i - 1][j].GetComponent<Cell>().type;
+                }
+                if (i > 1)
+                {
+                    topTopCell = grid[i - 2][j].GetComponent<Cell>().type;
+                }
+                if (topCell == topTopCell)
+                {
+                    bannedTypes.Add(topCell);
+                }
+                CellType actualCell = Cell.GetCellType(bannedTypes);
                 Vector3 position = new Vector3(startPositionX, startPositionY, 0f);
                 GameObject cell = Instantiate(cellPrefab, position, Quaternion.identity, gameObject.transform);
-                //GameObject test = Instantiate(boxTest, position, Quaternion.identity);
-                //test.GetComponent<SpriteRenderer>().sprite = tileWater;
-
+                cell.GetComponent<SpriteRenderer>().sortingOrder = i;
+                cell.GetComponent<Cell>().type = actualCell;
+                cell.GetComponent<Cell>().setSprite();
+                grandPreviousCell = previousCell;
+                previousCell = actualCell;
+                topTopCell = topCell;
                 startPositionX++;
+                newRow.Add(cell);
             }
             startPositionX = 0;
             startPositionY--;
@@ -45,6 +71,7 @@ public class Grid : MonoBehaviour
             grid.Add(newRow);
         }
     }
+
     public Vector3 GetCellCenter()
     {
         return new Vector3(width / 2 - 0.5f, -(height / 2 - 0.5f), 0);
