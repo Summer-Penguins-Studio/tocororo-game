@@ -161,6 +161,37 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public bool checkNeighboord(Cell cell1, Cell cell2)
+    {
+        bool areClose = false;
+
+        (int cell1X, int cell1Y) = this.findCellPosition(cell1);
+        (int cell2X, int cell2Y) = this.findCellPosition(cell2);
+
+        if(cell1X > 0 && cell1Y > 0 && cell2X > 0 && cell2Y > 0)
+        {
+            if(cell1X == cell2X)
+            {
+                int dif = cell2Y - cell1Y;
+                if (dif == -1 || dif == 1)
+                {
+                    areClose = true;
+                }
+            }
+
+            else if (cell1Y == cell2Y)
+            {
+                int dif = cell2X - cell1X;
+                if (dif == -1 || dif == 1)
+                {
+                    areClose = true;
+                }
+            }
+        }
+
+        return areClose;
+    }
+
     private bool destroyCells()
     {
         bool change = false;

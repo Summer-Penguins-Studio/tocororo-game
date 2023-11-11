@@ -291,8 +291,19 @@ public class Cell : MonoBehaviour
         }
         else
         {
-            //this.METODODEHECTORBRO;
-            //gameController.SelectedCell.METODODEHECTORBRO;
+            Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+
+            bool close = grid.checkNeighboord(gameController.SelectedCell, this);
+
+            if (close)
+            {
+                this.move(gameController.SelectedCell);
+                gameController.SelectedCell = null;
+            }
+            else
+            {
+                gameController.SelectedCell = this;
+            }
         }
     }
 }
