@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public Grid map;
+    private Grid map;
     private Vector3 target;
     // Start is called before the first frame update
     void Start()
@@ -19,8 +19,6 @@ public class CameraController : MonoBehaviour
 
     private void OnEnable()
     {
-        map = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
-        target = map.GetCellCenter();
-        transform.position = target + new Vector3(0,0,-2);
+        transform.position = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>().GetCellCenter() + new Vector3(0,0,-2);
     }
 }

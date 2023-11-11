@@ -9,6 +9,5 @@ public enum CellType
     THREE,
     FOUR,
     FIVE,
-    SIX,
-    SEVEN
+    NONE
 }
