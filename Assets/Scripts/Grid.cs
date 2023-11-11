@@ -68,6 +68,28 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public (int, int) findCellPosition(Cell cell)
+    {
+        int x = -1;
+        int y = -1;
+
+        for(int i = 0; i < this.grid.Count; i++)
+        {
+            for(int j =0; j < this.grid[i].Count; j++)
+            {
+                Cell currentCell = this.getCell(this.grid[i][j]);
+
+                if(currentCell == cell)
+                {
+                    x = i;
+                    y = j;
+                }
+            }
+        }
+
+        return (x, y);
+    }
+
     public Cell getCell(GameObject obj){
         return obj.GetComponent<Cell>();
     }

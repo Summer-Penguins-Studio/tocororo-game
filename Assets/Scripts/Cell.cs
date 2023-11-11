@@ -151,6 +151,13 @@ public class Cell : MonoBehaviour
         
     }
 
+    public void move(Cell otherCell) 
+    {
+        Vector3 auxiliar = this.gameObject.transform.position;
+        transform.position = otherCell.gameObject.transform.position;
+        otherCell.transform.position = auxiliar;
+    }
+
     private void upgrade()
     {
         switch (type)
