@@ -18,8 +18,9 @@ public class Grid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+    
     }
+
     private void initGrid()
     {
         int startPositionX = 0;
@@ -47,5 +48,83 @@ public class Grid : MonoBehaviour
     public Vector3 GetCellCenter()
     {
         return new Vector3(width / 2 - 0.5f, -(height / 2 - 0.5f), 0);
+    }
+
+    public Cell getCellByPos(int x, int y) {
+        if(x < 0 || x > this.grid.Count - 1)
+        {
+            return null;
+        }
+        else
+        {
+            if(y < 0 || y > this.grid[x].Count - 1)
+            {
+                return null;
+            }
+            else
+            {
+                return this.getCell(this.grid[x][y]);
+            }
+        }
+    }
+
+    public Cell getCell(GameObject obj){
+        return obj.GetComponent<Cell>();
+    }
+
+    public void onClick(){
+        while (this.destroyCells())
+        {
+            this.adjust();
+        }
+    }
+
+    private void adjust() {
+        int startPositionX = 0;
+
+        for (int i = this.grid.Count - 1; i >= 0; i--)
+        {
+            for(int j = 0; j < this.grid[i].Count; j++)
+            {
+                Cell cell = this.getCell(this.grid[i][j]);
+
+                if(cell == null && i == 0)
+                {
+                    Vector3 position = new Vector3(startPositionX, 0, 0f);
+                    GameObject newCell = Instantiate(cellPrefab, position, Quaternion.identity, gameObject.transform);
+
+                    this.grid[i][j] = newCell;
+                }
+
+                if(cell == null && i != 0)
+                {
+                    int topPos = i - 1;
+
+                    this.grid[i][j] = this.grid[topPos][j];
+                    this.grid[topPos][j] = null;
+
+                }
+
+                startPositionX++;
+            }
+
+            startPositionX = 0;
+        }
+    }
+
+    private bool destroyCells()
+    {
+        bool change = false;
+
+        for (int i = 0; i < this.grid.Count && !change; i++)
+        {
+            for (int j = 0; j < this.grid[i].Count && !change; j++)
+            {
+                Cell cell = this.getCell(this.grid[i][j]);
+                change = cell.check(i, j);
+            }
+        }
+
+        return change;
     }
 }
