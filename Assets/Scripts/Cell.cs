@@ -228,9 +228,21 @@ public class Cell : MonoBehaviour
 
     public void move(Cell otherCell) 
     {
+        Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+
         Vector3 auxiliar = this.gameObject.transform.position;
         transform.position = otherCell.gameObject.transform.position;
         otherCell.transform.position = auxiliar;
+
+        (int meX, int meY) = grid.findCellPosition(this);
+        (int otherX, int otherY) = grid.findCellPosition(otherCell);
+
+        if (otherX > 0 && otherY > 0 && meX > 0 && meY > 0)
+        {
+            GameObject aux = grid.grid[meX][meY];
+            grid.grid[meX][meY] = grid.grid[otherX][otherY];
+            grid.grid[otherX][otherY] = aux;
+        }
     }
 
     private void upgrade()
