@@ -134,10 +134,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameController
       objectReference: {fileID: 0}
-    - target: {fileID: 490158917972940775, guid: 18537be47dcfd9841abbf1a659b03b30, type: 3}
-      propertyPath: m_TagString
-      value: GameController
-      objectReference: {fileID: 0}
     - target: {fileID: 9148280020419385711, guid: 18537be47dcfd9841abbf1a659b03b30, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -251,14 +247,6 @@ PrefabInstance:
     - target: {fileID: 8362932684067558685, guid: b890eeca80b0bc649854d7568e9ed5e2, type: 3}
       propertyPath: m_Name
       value: Grid
-      objectReference: {fileID: 0}
-    - target: {fileID: 8362932684067558686, guid: b890eeca80b0bc649854d7568e9ed5e2, type: 3}
-      propertyPath: width
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8362932684067558686, guid: b890eeca80b0bc649854d7568e9ed5e2, type: 3}
-      propertyPath: height
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8362932684067558687, guid: b890eeca80b0bc649854d7568e9ed5e2, type: 3}
       propertyPath: m_RootOrder
