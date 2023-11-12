@@ -8,5 +8,4 @@ public enum CellDirection
     RIGHT,
     BOTTOM,
     TOP,
-    DEFAULT,
 }

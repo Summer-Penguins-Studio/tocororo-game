@@ -121,11 +121,10 @@ public class Grid : MonoBehaviour
         return obj.GetComponent<Cell>();
     }
 
-    public void onClick(){
-        while (this.destroyCells())
-        {
-            this.adjust();
-        }
+    public void onClick(Cell from, Cell to){
+        from.check();
+        this.adjust();
+        
     }
 
     private void adjust() {
@@ -137,7 +136,7 @@ public class Grid : MonoBehaviour
             {
                 Cell cell = this.getCell(this.grid[i][j]);
 
-                if(cell == null && i == 0)
+                if(cell.remove && i == 0)
                 {
                     Vector3 position = new Vector3(startPositionX, 0, 0f);
                     GameObject newCell = Instantiate(cellPrefab, position, Quaternion.identity, gameObject.transform);
@@ -145,19 +144,45 @@ public class Grid : MonoBehaviour
                     this.grid[i][j] = newCell;
                 }
 
-                if(cell == null && i != 0)
+                if(cell.remove && i != 0)
                 {
                     int topPos = i - 1;
+                    Cell topCell = this.getCell(this.grid[topPos][j]);
+
+                    topCell.gameObject.transform.position = cell.gameObject.transform.position;
 
                     this.grid[i][j] = this.grid[topPos][j];
-                    this.grid[topPos][j] = null;
-
+                    topCell.remove = true;
                 }
 
                 startPositionX++;
             }
 
             startPositionX = 0;
+        }
+    }
+
+    private void moveDown(int posX, int posY)
+    {
+        Cell cell = this.getCellByPos(posX, posY);
+
+        if (posY == 0)
+        {
+            Vector3 position = new Vector3(posX, 0, 0f);
+            GameObject newCell = Instantiate(cellPrefab, position, Quaternion.identity, gameObject.transform);
+
+            this.grid[i][j] = newCell;
+        }
+
+        if (posY != 0)
+        {
+            int topPos = posY - 1;
+            Cell topCell = this.getCell(this.grid[topPos][j]);
+
+            topCell.gameObject.transform.position = cell.gameObject.transform.position;
+
+            this.grid[i][j] = this.grid[topPos][j];
+            topCell.remove = true;
         }
     }
 
@@ -201,7 +226,7 @@ public class Grid : MonoBehaviour
             for (int j = 0; j < this.grid[i].Count && !change; j++)
             {
                 Cell cell = this.getCell(this.grid[i][j]);
-                change = cell.check(i, j);
+                change = cell.check();
             }
         }
 

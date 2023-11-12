@@ -8,6 +8,7 @@ public class Cell : MonoBehaviour
     private List<Item> items;
     [SerializeField]
     public SpriteManager spriteManager;
+    public bool remove = false;
 
     public static CellType GetCellType(List<CellType> bannedTypes)
     {
@@ -100,125 +101,171 @@ public class Cell : MonoBehaviour
         return other.type == this.type;
     }
 
-    public bool check(int posX, int posY)
+    public bool check()
     {
-        return this.destroyCells(this, posX, posY, CellDirection.DEFAULT, new List<Cell>());
+        Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+        (int posX, int posY) = grid.findCellPosition(this);
+
+        int leftPos = posY - 1;
+        int rightPos = posY + 1;
+        int topPos = posX - 1;
+        int bottomPos = posX + 1;
+
+        List<Cell> leftEquals = new List<Cell>();
+        leftEquals.Add(this);
+        Cell leftCell = grid.getCellByPos(posX, leftPos);
+        if (leftCell != null && leftCell.equal(this))
+        {
+            leftEquals.Add(leftCell);
+            leftCell.destroyCells(posX, leftPos, CellDirection.LEFT, leftEquals);
+        }
+
+        List<Cell> rightEquals = new List<Cell>();
+        rightEquals.Add(this);
+        Cell rightCell = grid.getCellByPos(posX, rightPos);
+        if (rightCell != null && rightCell.equal(this))
+        {
+            rightEquals.Add(rightCell);
+            rightCell.destroyCells(posX, rightPos, CellDirection.RIGHT, rightEquals);
+        }
+
+        List<Cell> topEquals = new List<Cell>();
+        topEquals.Add(this);
+        Cell topCell = grid.getCellByPos(topPos, posY);
+        if (topCell != null && topCell.equal(this))
+        {
+            topEquals.Add(topCell);
+            topCell.destroyCells(topPos, posY, CellDirection.TOP, topEquals);
+        }
+
+        List<Cell> bottomEquals = new List<Cell>();
+        bottomEquals.Add(this);
+        Cell bottomCell = grid.getCellByPos(bottomPos, posY);
+        if (bottomCell != null && bottomCell.equal(this))
+        {
+            bottomEquals.Add(bottomCell);            
+            bottomCell.destroyCells(bottomPos, posY, CellDirection.BOTTOM, bottomEquals);
+        }
+
+        int horizontalCount = leftEquals.Count + rightEquals.Count - 1;
+        int verticalCount = bottomEquals.Count + topEquals.Count - 1;
+
+        print("Position: " + posX + " " + posY);
+        print(leftEquals.Count);
+        print(rightEquals.Count);
+        print(topEquals.Count);
+        print(bottomEquals.Count);
+        print("\n");
+
+        bool isGonnaUpgrade = false;
+        if (horizontalCount >= 3)
+        {
+            foreach (Cell c in leftEquals)
+            {
+                if (!(c == this))
+                {
+                    Destroy(c.gameObject);
+                    c.remove = true;
+                }
+            }
+
+            foreach (Cell c in rightEquals)
+            {
+                if (!(c == this))
+                {
+                    Destroy(c.gameObject);
+                    c.remove = true;
+                }
+            }
+
+            isGonnaUpgrade = true;
+        }
+
+        else if (verticalCount >= 3)
+        {
+            foreach (Cell c in bottomEquals)
+            {
+                if (!(c == this))
+                {
+                    Destroy(c.gameObject);
+                    c.remove = true;
+                }
+            }
+
+            foreach (Cell c in topEquals)
+            {
+                if (!(c == this))
+                {
+                    Destroy(c.gameObject);
+                    c.remove = true;
+                }
+            }
+
+            isGonnaUpgrade = true;
+        }
+
+        if (isGonnaUpgrade)
+        {
+            this.upgrade();
+            this.setSprite();
+        }
+
+        return isGonnaUpgrade;
     }
 
-    public bool destroyCells(Cell root, int posX, int posY, CellDirection direction, List<Cell> equals) {
+    public bool destroyCells(int posX, int posY, CellDirection direction, List<Cell> equals) {
         Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
 
-        int leftPos = posX - 1;
-        int rightPos = posX + 1;
-        int topPos = posY - 1;
-        int bottomPos = posY + 1;
+        int leftPos = posY - 1;
+        int rightPos = posY + 1;
+        int topPos = posX - 1;
+        int bottomPos = posX + 1;
 
         switch (direction)
         {
             case CellDirection.LEFT:
-                Cell left = grid.getCellByPos(leftPos, posY);
+                Cell left = grid.getCellByPos(posX, leftPos);
 
                 if (left != null && left.equal(this))
                 {
                     equals.Add(left);
-                    left.destroyCells(left, leftPos, posY, CellDirection.LEFT, equals);
+                    left.destroyCells(posX, leftPos, CellDirection.LEFT, equals);
                 }
                 
                 return false;
 
             case CellDirection.RIGHT:
-                Cell right = grid.getCellByPos(rightPos, posY);
+                Cell right = grid.getCellByPos(posX, rightPos);
 
                 if (right != null && right.equal(this))
                 {
                     equals.Add(right);
-                    right.destroyCells(right, rightPos, posY, CellDirection.RIGHT, equals);
+                    right.destroyCells(posX, rightPos, CellDirection.RIGHT, equals);
                 }
 
                 return false;
 
             case CellDirection.BOTTOM:
-                Cell bottom = grid.getCellByPos(posX, bottomPos);
+                Cell bottom = grid.getCellByPos(bottomPos, posY);
 
                 if (bottom != null && bottom.equal(this))
                 {
                     equals.Add(bottom);
-                    bottom.destroyCells(bottom, posX, bottomPos, CellDirection.BOTTOM, equals);
+                    bottom.destroyCells(bottomPos, posY, CellDirection.BOTTOM, equals);
                 }
 
                 return false;
 
             case CellDirection.TOP:
-                Cell top = grid.getCellByPos(posX, topPos);
+                Cell top = grid.getCellByPos(topPos, posY);
 
                 if (top != null && top.equal(this))
                 {
                     equals.Add(top);
-                    top.destroyCells(top, posX, topPos, CellDirection.TOP, equals);
+                    top.destroyCells(topPos, posY, CellDirection.TOP, equals);
                 }
 
                 return false;
-
-            case CellDirection.DEFAULT:
-                List<Cell> leftEquals = new List<Cell>();
-                leftEquals.Add(this);
-                Cell leftCell = grid.getCellByPos(leftPos, posY);
-                if(leftCell != null) leftCell.destroyCells(root, leftPos, posY, CellDirection.LEFT, leftEquals);
-
-                List<Cell> rightEquals = new List<Cell>();
-                rightEquals.Add(this);
-                Cell rightCell = grid.getCellByPos(rightPos, posY);
-                if (rightCell != null) rightCell.destroyCells(root, leftPos, posY, CellDirection.RIGHT, rightEquals);
-
-                List<Cell> topEquals = new List<Cell>();
-                topEquals.Add(this);
-                Cell topCell = grid.getCellByPos(rightPos, posY);
-                if (topCell != null) topCell.destroyCells(root, leftPos, posY, CellDirection.TOP, topEquals);
-
-                List<Cell> bottomEquals = new List<Cell>();
-                bottomEquals.Add(this);
-                Cell bottomCell = grid.getCellByPos(rightPos, posY);
-                if (bottomCell != null)  bottomCell.destroyCells(root, leftPos, posY, CellDirection.BOTTOM, bottomEquals);
-
-                int horizontalCount = leftEquals.Count + rightEquals.Count - 1;
-                int verticalCount = bottomEquals.Count + topEquals.Count - 1;
-
-                bool isGonnaUpgrade = false;
-                if(horizontalCount >= 3)
-                {
-                    foreach(Cell c in leftEquals) {
-                        Destroy(c.gameObject);
-                    }
-
-                    foreach(Cell c in rightEquals)
-                    {
-                        Destroy(c.gameObject);
-                    }
-
-                    isGonnaUpgrade = true;
-                }
-
-                else if(verticalCount >= 3)
-                {
-                    foreach(Cell c in bottomEquals)
-                    {
-                        Destroy(c.gameObject);
-                    }
-
-                    foreach(Cell c in topEquals)
-                    {
-                        Destroy(c.gameObject);
-                    }
-
-                    isGonnaUpgrade = true;
-                }
-
-                if (isGonnaUpgrade)
-                {
-                    this.upgrade();
-                }
-
-                return isGonnaUpgrade;
 
             default:
                 return false;
@@ -294,10 +341,10 @@ public class Cell : MonoBehaviour
             Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
 
             bool close = grid.checkNeighboord(gameController.SelectedCell, this);
-
             if (close)
             {
                 this.move(gameController.SelectedCell);
+                grid.onClick(gameController.SelectedCell, this);
                 gameController.SelectedCell = null;
             }
             else
