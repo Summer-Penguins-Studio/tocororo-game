@@ -171,17 +171,17 @@ public class Grid : MonoBehaviour
             Vector3 position = new Vector3(posX, 0, 0f);
             GameObject newCell = Instantiate(cellPrefab, position, Quaternion.identity, gameObject.transform);
 
-            this.grid[i][j] = newCell;
+            this.grid[posY][posX] = newCell;
         }
 
         if (posY != 0)
         {
             int topPos = posY - 1;
-            Cell topCell = this.getCell(this.grid[topPos][j]);
+            Cell topCell = this.getCell(this.grid[topPos][posX]);
 
             topCell.gameObject.transform.position = cell.gameObject.transform.position;
 
-            this.grid[i][j] = this.grid[topPos][j];
+            this.grid[posX][posY] = this.grid[topPos][posX];
             topCell.remove = true;
         }
     }
